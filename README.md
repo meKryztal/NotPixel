@@ -29,13 +29,13 @@
 
 3. Запуск
    ```
-   python cspr.py
+   python not.py
    ```
 
    или
 
    ```
-   python3 cspr.py
+   python3 not.py
    ```
    
 # Или через Pycharm ГАЙД на любых системах и решения ошибок внизу гайда
