@@ -1,0 +1,6 @@
+requests
+cloudscraper
+pyrogram
+fake-useragent
+colorama
+TgCrypto
