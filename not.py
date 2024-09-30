@@ -20,8 +20,8 @@ init(autoreset=True)
 
 PROXY_TYPE = "socks5"  # http/socks5
 USE_PROXY = False  # True/False
-API_ID = 22579982  # апи
-API_HASH = '2825cfd9be7a2b620e1753fa646cd3d6'
+API_ID = 11111111  # апи
+API_HASH = 'gfdfgdfgdfgdfgdfgdf'
 REF = '382695384'  # рефка для запуска бота
 SQUAD = -1001943111151  # айди канала сквала
 SQUAD2 = "cmVmPTY5MjIxMjcwODk="  # рефка сквада
