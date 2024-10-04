@@ -1,6 +1,7 @@
 import sys
 import json
 import time
+import PIL
 import requests
 from datetime import datetime
 from colorama import init, Fore, Style
@@ -13,18 +14,21 @@ from fake_useragent import UserAgent
 from pyrogram.raw.functions.messages import RequestAppWebView
 from pyrogram.raw.types import InputBotAppShortName
 import random
-
+from random import randint
+from PIL import Image
+from io import BytesIO
 
 init(autoreset=True)
 
 
 PROXY_TYPE = "socks5"  # http/socks5
 USE_PROXY = False  # True/False
-API_ID = 11111111  # апи
-API_HASH = 'gfdfgdfgdfgdfgdfgdf'
+API_ID = 1111111  # апи
+API_HASH = 'fgdfgdf'
 REF = '382695384'  # рефка для запуска бота
 SQUAD = -1001943111151  # айди канала сквала
 SQUAD2 = "cmVmPTY5MjIxMjcwODk="  # рефка сквада
+X3 = 0  # х3 поинты за рисование 
 
 # Включите нужные таски убрав #
 TASKS_LIST = [
@@ -40,6 +44,7 @@ TASKS_LIST = [
     #"leagueBonusSilver"
     #"leagueBonusGold"
     #"leagueBonusPlatinum"
+    "makePixelAvatar"
     ]
 
 
@@ -73,6 +78,80 @@ class PixelTod:
         self.name = "app"
         self.squad_prox = None
         self.account_squad = None
+        self.Reward = {
+            2: {
+                "Price": 5,
+            },
+            3: {
+                "Price": 100,
+            },
+            4: {
+                "Price": 200,
+            },
+            5: {
+                "Price": 300,
+            },
+            6: {
+                "Price": 500,
+            },
+            7: {
+                "Price": 600,
+                "Max": 1
+            }
+        }
+
+        self.Speed = {
+            2: {
+                "Price": 5,
+            },
+            3: {
+                "Price": 100,
+            },
+            4: {
+                "Price": 200,
+            },
+            5: {
+                "Price": 300,
+            },
+            6: {
+                "Price": 400,
+            },
+            7: {
+                "Price": 500,
+            },
+            8: {
+                "Price": 600,
+            },
+            9: {
+                "Price": 700,
+            },
+            10: {
+                "Price": 800,
+            },
+            11: {
+                "Price": 900,
+                "Max": 1
+            }
+        }
+
+        self.Limit = {
+            2: {
+                "Price": 5,
+            },
+            3: {
+                "Price": 100,
+            },
+            4: {
+                "Price": 200,
+            },
+            5: {
+                "Price": 300,
+            },
+            6: {
+                "Price": 400,
+                "Max": 1
+            }
+        }
 
     def data_parsing(self, data):
         return {key: value for key, value in (i.split('=') for i in unquote(data).split('&'))}
@@ -230,7 +309,6 @@ class PixelTod:
                             self.log(f"{Fore.LIGHTRED_EX}{session}.session is invalid")
 
                         client.disconnect()
-                        
                     else:
                         client = Client(name=session, api_id=API_ID, api_hash=API_HASH, workdir="sessions/")
 
@@ -338,7 +416,7 @@ class PixelTod:
         if res.status_code == 200 or res.status_code == 201:
             response_data = res.json()
             self.log(f"{Fore.LIGHTYELLOW_EX}Аккаунт: {Fore.LIGHTWHITE_EX}{response_data['firstName']}")
-            self.log(f"{Fore.LIGHTYELLOW_EX}Баланс: {Fore.LIGHTWHITE_EX}{response_data['balance']}")
+
             squad = response_data['squad']
 
             if squad['id'] is None:
@@ -423,31 +501,125 @@ class PixelTod:
         y = (position - 1) // width
         return x, y
 
+    def cor_id(self, x: int, y: int, x1: int, y1: int):
+        px_id = randint(min(y, y1), max(y1, y)) * 1000
+        px_id += randint(min(x, x1), max(x1, x)) + 1
+        return px_id
+
+    def rgb_to_hex(self, rgb):
+        return "#{:02x}{:02x}{:02x}".format(rgb[0], rgb[1], rgb[2]).upper()
+
+    def get_random_coordinates(self, area):
+        x_start, x_end, y_start, y_end = area
+        x = random.randint(x_start, x_end)
+        y = random.randint(y_start, y_end)
+        return (x, y)
+
+    def compare_images(self):
+        image1_path = '1.png'
+        image2_path = 'orig.png'
+
+        areas = [
+            (0, 255, 372, 627),
+            (372, 627, 372, 627),
+            (744, 999, 372, 627)
+        ]
+
+        image1 = Image.open(image1_path)
+        image2 = Image.open(image2_path)
+        pixels1 = image1.load()
+        pixels2 = image2.load()
+
+        target_colors = [
+            "#FFFFFF", "#000000"
+        ]
+
+
+
+        for area in areas:
+            while True:
+                (x, y) = self.get_random_coordinates(area)
+                color1 = pixels1[x, y]
+                color2 = pixels2[x, y]
+                hex_color1 = self.rgb_to_hex(color1)
+                hex_color2 = self.rgb_to_hex(color2)
+                if hex_color1 != hex_color2 and hex_color2 in target_colors:
+                    id = y * 1000
+                    id += x + 1
+                    col = hex_color2
+                    return id, col
+
 
     def paint_pixel(self, data: Data):
+
+
+        url_img = "https://notpx.app/api/v2/image"
         url = "https://notpx.app/api/v1/mining/status"
         headers = self.base_headers.copy()
         headers["Authorization"] = f"initData {data.init_data}"
+        if X3 == 2:
+
+            max_retries = 10
+            for attempt in range(max_retries):
+                try:
+                    res_img = self.api_call(url_img, headers=headers)
+                    image = Image.open(BytesIO(res_img.content))
+                    image.save("1.png")
+                    res_img.raise_for_status()
+                    break
+                except (requests.exceptions.ChunkedEncodingError, requests.exceptions.HTTPError, PIL.UnidentifiedImageError):
+
+                    time.sleep(3)
+
         res = self.api_call(url, headers=headers)
 
         if res.status_code == 200 or res.status_code == 201:
             response_data = res.json()
             num = response_data['charges']
+            self.log(f"{Fore.LIGHTYELLOW_EX}Баланс: {Fore.LIGHTWHITE_EX}{response_data['userBalance']}")
             for _ in range(num):
                 time.sleep(3)
-                color = random.choice(["#e46e6e", "#FFD635", "#7EED56", "#00CCC0", "#51E9F4", "#94B3FF", "#E4ABFF", "#FF99AA", "#FFB470", "#FFFFFF"])
-                pixel_id = random.randint(1, 1000000)
+                if X3 == 1:
+                    url_cor = "https://raw.githubusercontent.com/meKryztal/corpix/refs/heads/main/cor.json"
+                    res_cor = self.api_call(url_cor, headers=headers)
+                    cor = res_cor.json()
+                    paint = random.choice(cor['data'])
+                    color = paint['color']
+                    random_cor = random.choice(paint['cordinates'])
+                    pixel_id = self.cor_id(random_cor['start'][0], random_cor['start'][1], random_cor['end'][0], random_cor['end'][1])
+
+                elif X3 == 2:
+                    ids = self.compare_images()
+                    if ids:
+                        pixel_id = ids[0]
+                        color = ids[1]
+                    else:
+                        pixel_id = 473169
+                        color = "#FFFFFF"
+
+                else:
+                    color = random.choice(
+                        ["#e46e6e", "#FFD635", "#7EED56", "#00CCC0", "#51E9F4", "#94B3FF", "#E4ABFF", "#FF99AA",
+                         "#FFB470", "#FFFFFF", "#BE0039", "#FF9600", "#00CC78",
+                         "#009EAA", "#3690EA", "#6A5CFF", "#B44AC0", "#FF3881", "#9C6926", "#898D90", "#6D001A", "#BF4300"])
+                    pixel_id = random.randint(1, 1000000)
+
                 datat = {
                     "pixelId": pixel_id,
                     "newColor": color
                 }
+
                 url = "https://notpx.app/api/v1/repaint/start"
                 headers = self.base_headers.copy()
                 headers["Authorization"] = f"initData {data.init_data}"
                 res = self.api_call(url, headers=headers, data=json.dumps(datat), method='POST')
+
                 if res.status_code == 200 or res.status_code == 201:
+                    response_data = res.json()
+                    bal = response_data['balance']
                     self.log(
-                        f"{Fore.LIGHTYELLOW_EX}Нарисовал {Fore.LIGHTWHITE_EX}{self.position_to_coordinates(pixel_id)} {Fore.LIGHTYELLOW_EX}Цвет {Fore.LIGHTWHITE_EX}{color}")
+                        f"{Fore.LIGHTYELLOW_EX}Нарисовал,{Fore.LIGHTWHITE_EX} {Fore.LIGHTYELLOW_EX}Баланс: {Fore.LIGHTWHITE_EX}{bal}")
+
                 else:
                     self.log(f"{Fore.LIGHTRED_EX}Не могу нарисавать ")
                     break
@@ -462,11 +634,14 @@ class PixelTod:
 
         if res.status_code == 200 or res.status_code == 201:
             response_data = res.json()
-            boost = response_data["boosts"]
+            user_balance = response_data['userBalance']
+            levels_recharge = response_data['boosts']['reChargeSpeed'] + 1
+            levels_paintreward = response_data['boosts']['paintReward'] + 1
+            levels_energylimit = response_data['boosts']['energyLimit'] + 1
 
 
             time.sleep(3)
-            if boost["paintReward"] < 7:
+            if levels_paintreward - 1 < 7 and self.Reward[levels_paintreward]['Price'] <= user_balance:
                 url1 = "https://notpx.app/api/v1/mining/boost/check/paintReward"
                 headers1 = self.base_headers.copy()
                 headers1["Authorization"] = f"initData {data.init_data}"
@@ -478,7 +653,7 @@ class PixelTod:
 
 
             time.sleep(3)
-            if boost["reChargeSpeed"] < 11:
+            if levels_recharge - 1 < 11 and self.Speed[levels_recharge]['Price'] <= user_balance:
                 url2 = "https://notpx.app/api/v1/mining/boost/check/reChargeSpeed"
                 headers2 = self.base_headers.copy()
                 headers2["Authorization"] = f"initData {data.init_data}"
@@ -491,7 +666,7 @@ class PixelTod:
 
 
             time.sleep(3)
-            if boost["energyLimit"] < 6:
+            if levels_energylimit - 1 < 6 and self.Limit[levels_energylimit]['Price'] <= user_balance:
                 url3 = "https://notpx.app/api/v1/mining/boost/check/energyLimit"
                 headers3 = self.base_headers.copy()
                 headers3["Authorization"] = f"initData {data.init_data}"
