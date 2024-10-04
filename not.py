@@ -559,7 +559,7 @@ class PixelTod:
         headers["Authorization"] = f"initData {data.init_data}"
         if X3 == 2:
 
-            max_retries = 10
+            max_retries = 15
             for attempt in range(max_retries):
                 try:
                     res_img = self.api_call(url_img, headers=headers)
