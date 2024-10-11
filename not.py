@@ -520,7 +520,7 @@ class PixelTod:
 
     def compare_images(self):
         image1_path = '1.png'
-        image2_path = 'orig.png'
+        image2_path = 'orig1.png'
 
         areas = [
             (244, 755, 244, 755)
