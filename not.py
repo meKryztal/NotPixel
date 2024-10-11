@@ -45,6 +45,7 @@ TASKS_LIST = [
     #"leagueBonusGold",
     #"leagueBonusPlatinum",
     "makePixelAvatar",
+    "jettonTask",
     ]
 
 
