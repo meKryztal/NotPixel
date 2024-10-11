@@ -28,7 +28,7 @@ API_HASH = 'fgdfgdf'
 REF = '382695384'  # рефка для запуска бота
 SQUAD = -1001943111151  # айди канала сквала
 SQUAD2 = "cmVmPTY5MjIxMjcwODk="  # рефка сквада
-X3 = 0  # х3 поинты за рисование 
+X3 = 0  # х3 поинты за рисование
 
 # Включите нужные таски убрав #
 TASKS_LIST = [
@@ -40,11 +40,11 @@ TASKS_LIST = [
     "joinSquad",
     #"spendStars",
     "channel:notpixel_channel",
-    "channel:notcoin"
-    #"leagueBonusSilver"
-    #"leagueBonusGold"
-    #"leagueBonusPlatinum"
-    "makePixelAvatar"
+    "channel:notcoin",
+    #"leagueBonusSilver",
+    #"leagueBonusGold",
+    #"leagueBonusPlatinum",
+    "makePixelAvatar",
     ]
 
 
@@ -149,6 +149,9 @@ class PixelTod:
             },
             6: {
                 "Price": 400,
+            },
+            7: {
+                "Price": 10,
                 "Max": 1
             }
         }
@@ -520,9 +523,7 @@ class PixelTod:
         image2_path = 'orig.png'
 
         areas = [
-            (0, 255, 372, 627),
-            (372, 627, 372, 627),
-            (744, 999, 372, 627)
+            (244, 755, 244, 755)
         ]
 
         image1 = Image.open(image1_path)
@@ -531,7 +532,7 @@ class PixelTod:
         pixels2 = image2.load()
 
         target_colors = [
-            "#FFFFFF", "#000000"
+            "#FFFFFF", "#000000", "#3690EA"
         ]
 
 
