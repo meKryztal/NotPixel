@@ -533,7 +533,7 @@ class PixelTod:
         pixels2 = image2.load()
 
         target_colors = [
-            "#FFFFFF", "#000000", "#3690EA"
+            "#FFFFFF", "#000000",
         ]
 
 
