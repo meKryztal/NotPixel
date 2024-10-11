@@ -668,7 +668,7 @@ class PixelTod:
 
 
             time.sleep(3)
-            if levels_energylimit - 1 < 6 and self.Limit[levels_energylimit]['Price'] <= user_balance:
+            if levels_energylimit - 1 < 7 and self.Limit[levels_energylimit]['Price'] <= user_balance:
                 url3 = "https://notpx.app/api/v1/mining/boost/check/energyLimit"
                 headers3 = self.base_headers.copy()
                 headers3["Authorization"] = f"initData {data.init_data}"
