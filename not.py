@@ -28,7 +28,8 @@ API_HASH = 'fgdfgdf'
 REF = '382695384'  # рефка для запуска бота
 SQUAD = -1001943111151  # айди канала сквала
 SQUAD2 = "cmVmPTY5MjIxMjcwODk="  # рефка сквада
-X3 = 0  # х3 поинты за рисование
+X3 = 2  # х3 поинты за рисование
+PIC = 1  # 1 = OKX, 2 = NotPixel, 3 = fuckDurov
 
 # Включите нужные таски убрав #
 TASKS_LIST = [
@@ -45,7 +46,6 @@ TASKS_LIST = [
     #"leagueBonusGold",
     #"leagueBonusPlatinum",
     "makePixelAvatar",
-    "jettonTask",
     ]
 
 
@@ -400,6 +400,9 @@ class PixelTod:
                     res = self.scraper.get(url, headers=headers, proxies=proxy_dict)
                 elif method == 'POST':
                     res = self.scraper.post(url, headers=headers, data=data, proxies=proxy_dict)
+                elif method == 'PUT':
+                    res = self.scraper.put(url, headers=headers, proxies=proxy_dict)
+
                 else:
                     raise ValueError(f'Не поддерживаемый метод: {method}')
                 if res.status_code == 401:
@@ -521,11 +524,13 @@ class PixelTod:
 
     def compare_images(self):
         image1_path = '1.png'
-        image2_path = 'orig1.png'
+        image2_path = 'orig2.png'
 
-        areas = [
-            (244, 755, 244, 755)
-        ]
+        areas = {
+            (93, 220, 299, 426),
+        }
+
+
 
         image1 = Image.open(image1_path)
         image2 = Image.open(image2_path)
@@ -533,7 +538,7 @@ class PixelTod:
         pixels2 = image2.load()
 
         target_colors = [
-            "#FFFFFF", "#000000",
+            "#FFFFFF", "#000000"
         ]
 
 
@@ -559,19 +564,17 @@ class PixelTod:
         url = "https://notpx.app/api/v1/mining/status"
         headers = self.base_headers.copy()
         headers["Authorization"] = f"initData {data.init_data}"
-        if X3 == 2:
+        max_retries = 15
+        for attempt in range(max_retries):
+            try:
+                res_img = self.api_call(url_img, headers=headers)
+                image = Image.open(BytesIO(res_img.content))
+                image.save("1.png")
+                res_img.raise_for_status()
+                break
+            except (requests.exceptions.ChunkedEncodingError, requests.exceptions.HTTPError, PIL.UnidentifiedImageError):
 
-            max_retries = 15
-            for attempt in range(max_retries):
-                try:
-                    res_img = self.api_call(url_img, headers=headers)
-                    image = Image.open(BytesIO(res_img.content))
-                    image.save("1.png")
-                    res_img.raise_for_status()
-                    break
-                except (requests.exceptions.ChunkedEncodingError, requests.exceptions.HTTPError, PIL.UnidentifiedImageError):
-
-                    time.sleep(3)
+                time.sleep(3)
 
         res = self.api_call(url, headers=headers)
 
@@ -579,52 +582,59 @@ class PixelTod:
             response_data = res.json()
             num = response_data['charges']
             self.log(f"{Fore.LIGHTYELLOW_EX}Баланс: {Fore.LIGHTWHITE_EX}{response_data['userBalance']}")
-            for _ in range(num):
-                time.sleep(3)
-                if X3 == 1:
-                    url_cor = "https://raw.githubusercontent.com/meKryztal/corpix/refs/heads/main/cor.json"
-                    res_cor = self.api_call(url_cor, headers=headers)
-                    cor = res_cor.json()
-                    paint = random.choice(cor['data'])
-                    color = paint['color']
-                    random_cor = random.choice(paint['cordinates'])
-                    pixel_id = self.cor_id(random_cor['start'][0], random_cor['start'][1], random_cor['end'][0], random_cor['end'][1])
 
-                elif X3 == 2:
+            url_st = "https://notpx.app/api/v1/image/template/my"
+            url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
+            res_st = self.api_call(url_st, headers=headers)
+
+            if res_st.status_code == 200 or res_st.status_code == 201:
+                response_st = res_st.json()
+                if response_st["url"] != "https://static.notpx.app/templates/5726256852.png":
+
+                    url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
+                    reeee = self.api_call(url_s, headers=headers, method='PUT')
+                    print(f"{reeee.status_code}")
+
+
+            url_p = "https://notpx.app/api/v1/image/template/5726256852"
+            res_i = self.api_call(url_p, headers=headers)
+
+
+            if res_i.status_code == 200 or res.status_code == 201:
+
+                for _ in range(num):
+                    time.sleep(0.5)
                     ids = self.compare_images()
-                    if ids:
-                        pixel_id = ids[0]
-                        color = ids[1]
-                    else:
-                        pixel_id = 473169
-                        color = "#FFFFFF"
+                    pixel_id = ids[0]
+                    color = ids[1]
+                    datat = {
+                        "pixelId": pixel_id,
+                        "newColor": color
+                    }
+                    url = "https://notpx.app/api/v1/repaint/start"
+                    headers = self.base_headers.copy()
+                    headers["Authorization"] = f"initData {data.init_data}"
+                    retry_count = 0
+                    max_attempts = 3
+                    while retry_count < max_attempts:
+                        res = self.api_call(url, headers=headers, data=json.dumps(datat), method='POST')
 
+                        if res.status_code == 200 or res.status_code == 201:
+                            response_data = res.json()
+                            bal = response_data['balance']
+                            self.log(
+                                f"{Fore.LIGHTYELLOW_EX}Нарисовал,{Fore.LIGHTWHITE_EX} {Fore.LIGHTYELLOW_EX}Баланс: {Fore.LIGHTWHITE_EX}{bal}")
+                            break
+                        else:
+                            self.log(
+                                f"{Fore.LIGHTRED_EX}Не могу нарисовать. Попытка {retry_count + 1} из {max_attempts}.")
+                            retry_count += 1
+                            time.sleep(3)
+                    if retry_count == max_attempts:
+                        self.log(f"{Fore.LIGHTRED_EX}Не удалось нарисовать после {max_attempts} попыток.")
+                        break
                 else:
-                    color = random.choice(
-                        ["#e46e6e", "#FFD635", "#7EED56", "#00CCC0", "#51E9F4", "#94B3FF", "#E4ABFF", "#FF99AA",
-                         "#FFB470", "#FFFFFF", "#BE0039", "#FF9600", "#00CC78",
-                         "#009EAA", "#3690EA", "#6A5CFF", "#B44AC0", "#FF3881", "#9C6926", "#898D90", "#6D001A", "#BF4300"])
-                    pixel_id = random.randint(1, 1000000)
-
-                datat = {
-                    "pixelId": pixel_id,
-                    "newColor": color
-                }
-
-                url = "https://notpx.app/api/v1/repaint/start"
-                headers = self.base_headers.copy()
-                headers["Authorization"] = f"initData {data.init_data}"
-                res = self.api_call(url, headers=headers, data=json.dumps(datat), method='POST')
-
-                if res.status_code == 200 or res.status_code == 201:
-                    response_data = res.json()
-                    bal = response_data['balance']
-                    self.log(
-                        f"{Fore.LIGHTYELLOW_EX}Нарисовал,{Fore.LIGHTWHITE_EX} {Fore.LIGHTYELLOW_EX}Баланс: {Fore.LIGHTWHITE_EX}{bal}")
-
-                else:
-                    self.log(f"{Fore.LIGHTRED_EX}Не могу нарисавать ")
-                    break
+                    self.log(f"{Fore.LIGHTRED_EX}Ошибка установки шаблона картинки")
 
 
 
@@ -668,7 +678,7 @@ class PixelTod:
 
 
             time.sleep(3)
-            if levels_energylimit - 1 < 7 and self.Limit[levels_energylimit]['Price'] <= user_balance:
+            if levels_energylimit - 1 < 6 and self.Limit[levels_energylimit]['Price'] <= user_balance:
                 url3 = "https://notpx.app/api/v1/mining/boost/check/energyLimit"
                 headers3 = self.base_headers.copy()
                 headers3["Authorization"] = f"initData {data.init_data}"
