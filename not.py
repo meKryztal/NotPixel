@@ -592,8 +592,8 @@ class PixelTod:
                 if response_st["url"] != "https://static.notpx.app/templates/5726256852.png":
 
                     url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
-                    reeee = self.api_call(url_s, headers=headers, method='PUT')
-                    print(f"{reeee.status_code}")
+                    self.api_call(url_s, headers=headers, method='PUT')
+                    self.log(f"{Fore.LIGHTYELLOW_EX}Установил шаблон")
 
 
             url_p = "https://notpx.app/api/v1/image/template/5726256852"
@@ -633,8 +633,8 @@ class PixelTod:
                     if retry_count == max_attempts:
                         self.log(f"{Fore.LIGHTRED_EX}Не удалось нарисовать после {max_attempts} попыток.")
                         break
-                else:
-                    self.log(f"{Fore.LIGHTRED_EX}Ошибка установки шаблона картинки")
+            else:
+                self.log(f"{Fore.LIGHTRED_EX}Ошибка установки шаблона картинки")
 
 
 
