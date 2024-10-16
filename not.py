@@ -594,10 +594,12 @@ class PixelTod:
                     url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
                     self.api_call(url_s, headers=headers, method='PUT')
                     self.log(f"{Fore.LIGHTYELLOW_EX}Установил шаблон")
+                    time.sleep(0.5)
             elif res_st.status_code == 404:
                 url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
-                    self.api_call(url_s, headers=headers, method='PUT')
-                    self.log(f"{Fore.LIGHTYELLOW_EX}Установил шаблон")
+                self.api_call(url_s, headers=headers, method='PUT')
+                self.log(f"{Fore.LIGHTYELLOW_EX}Установил шаблон")
+                time.sleep(0.5)
                 
 
 
@@ -608,7 +610,7 @@ class PixelTod:
             if res_i.status_code == 200 or res.status_code == 201:
 
                 for _ in range(num):
-                    time.sleep(0.5)
+                    
                     ids = self.compare_images()
                     pixel_id = ids[0]
                     color = ids[1]
@@ -623,6 +625,7 @@ class PixelTod:
                     max_attempts = 3
                     while retry_count < max_attempts:
                         res = self.api_call(url, headers=headers, data=json.dumps(datat), method='POST')
+                        time.sleep(0.5)
 
                         if res.status_code == 200 or res.status_code == 201:
                             response_data = res.json()
