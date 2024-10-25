@@ -29,6 +29,11 @@ REF = '382695384'  # рефка для запуска бота
 SQUAD = -1001943111151  # айди канала сквала
 SQUAD2 = "cmVmPTY5MjIxMjcwODk="  # рефка сквада
 
+################################################
+NUM = 1345237852 # номер картинки
+COR = (99, 130, 190, 221)  # координаты x1 x2 y1 y2
+COLOR = ["#000000"]  # цвета
+################################################
 
 
 # Включите нужные таски убрав #
@@ -524,11 +529,10 @@ class PixelTod:
 
     def compare_images(self):
         image1_path = '1.png'
-        image2_path = 'orig2.png'
+        image2_path = 'orig3.png'
 
-        areas = {
-            (93, 220, 299, 426),
-        }
+        areas = {COR}
+
 
 
 
@@ -537,9 +541,7 @@ class PixelTod:
         pixels1 = image1.load()
         pixels2 = image2.load()
 
-        target_colors = [
-            "#FFFFFF", "#000000"
-        ]
+        target_colors = COLOR
 
 
 
@@ -584,33 +586,31 @@ class PixelTod:
             self.log(f"{Fore.LIGHTYELLOW_EX}Баланс: {Fore.LIGHTWHITE_EX}{response_data['userBalance']}")
 
             url_st = "https://notpx.app/api/v1/image/template/my"
-            url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
+
             res_st = self.api_call(url_st, headers=headers)
 
             if res_st.status_code == 200 or res_st.status_code == 201:
                 response_st = res_st.json()
-                if response_st["url"] != "https://static.notpx.app/templates/5726256852.png":
+                if response_st["url"] != f"https://static.notpx.app/templates/{NUM}.png":
 
-                    url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
+                    url_s = f"https://notpx.app/api/v1/image/template/subscribe/{NUM}"
                     self.api_call(url_s, headers=headers, method='PUT')
                     self.log(f"{Fore.LIGHTYELLOW_EX}Установил шаблон")
-                    time.sleep(0.5)
+
             elif res_st.status_code == 404:
-                url_s = "https://notpx.app/api/v1/image/template/subscribe/5726256852"
+                url_s = f"https://notpx.app/api/v1/image/template/subscribe/{NUM}"
                 self.api_call(url_s, headers=headers, method='PUT')
                 self.log(f"{Fore.LIGHTYELLOW_EX}Установил шаблон")
-                time.sleep(0.5)
-                
 
 
-            url_p = "https://notpx.app/api/v1/image/template/5726256852"
+            url_p = f"https://notpx.app/api/v1/image/template/{NUM}"
             res_i = self.api_call(url_p, headers=headers)
 
 
             if res_i.status_code == 200 or res.status_code == 201:
 
                 for _ in range(num):
-                    
+                    time.sleep(0.1)
                     ids = self.compare_images()
                     pixel_id = ids[0]
                     color = ids[1]
@@ -625,7 +625,6 @@ class PixelTod:
                     max_attempts = 3
                     while retry_count < max_attempts:
                         res = self.api_call(url, headers=headers, data=json.dumps(datat), method='POST')
-                        time.sleep(0.5)
 
                         if res.status_code == 200 or res.status_code == 201:
                             response_data = res.json()
