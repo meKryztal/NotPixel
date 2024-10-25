@@ -71,6 +71,7 @@ ip:port:login:password имя_файла_сессии_который_вы_вво
 # Ставим свой шаблон
 
 Заходим в devtools нажав F12, дальше network и чуть ниже включите fetch, ставим нужный шаблон и у нас появляется запрос с нашей картинкой 
+
 ![photo_2024-10-25_18-24-01](https://github.com/user-attachments/assets/742cae5f-ded0-48dc-966f-552ac9699009)
 
 ![photo_2024-10-25_17-31-58](https://github.com/user-attachments/assets/cb3fee72-777f-4802-834f-a37d092d87ea)
