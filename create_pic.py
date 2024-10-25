@@ -7,7 +7,7 @@ x = int(input("Введите координату X : ".format(1000 - overlay_w
 y = int(input("Введите координату Y : ".format(1000 - overlay_width)))
 if 0 <= x <= (1000 - overlay_width) and 0 <= y <= (1000 - overlay_width):
     background.paste(overlay, (x, y), overlay.split()[3])
-    background.save('orig2.png', format='PNG')
+    background.save('orig3.png', format='PNG')
     print(f'\nКоординаты ({x}, {x + overlay_width-1}, {y}, {y + overlay_width-1})')
 else:
     print("Координаты вне допустимого диапазона.")
