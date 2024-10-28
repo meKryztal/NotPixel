@@ -45,8 +45,8 @@ TASKS_LIST = [
     #"premium",
     "joinSquad",
     #"spendStars",
-    "channel:notpixel_channel",
-    "channel:notcoin",
+    #"channel:notpixel_channel",  # расскоментить 372 строку
+    #"channel:notcoin",  # расскоментить 373 строку
     #"leagueBonusSilver",
     #"leagueBonusGold",
     #"leagueBonusPlatinum",
@@ -347,38 +347,51 @@ class PixelTod:
             self.log(f"{Fore.LIGHTYELLOW_EX}Валидных сессий: {Fore.LIGHTWHITE_EX}{len(valid_sessions)}; {Fore.LIGHTYELLOW_EX}Невалидных: {Fore.LIGHTWHITE_EX}{len(sessions) - len(valid_sessions)}")
         return valid_sessions
 
-    def get_tg_web_data(self, account, prox, ref: str, peer: str, name: str):
-        auth_url = None
-        if USE_PROXY:
-            client = Client(name=account, api_id=API_ID, api_hash=API_HASH, workdir="sessions/", proxy=prox)
-        else:
-            client = Client(name=account, api_id=API_ID, api_hash=API_HASH, workdir="sessions/")
-        client.connect()
-        client.get_me()
+    def get_tg_web_data(self, account, prox, ref: str, peer: str, name: str, retries=3):
+        attempt = 0
+        while attempt < retries:
+            auth_url = None
+            if USE_PROXY:
+                client = Client(name=account, api_id=API_ID, api_hash=API_HASH, workdir="sessions/", proxy=prox)
+            else:
+                client = Client(name=account, api_id=API_ID, api_hash=API_HASH, workdir="sessions/")
+            client.connect()
+            client.get_me()
 
-        try:
-            bot = client.resolve_peer(peer)
-            app = InputBotAppShortName(bot_id=bot, short_name=f"{name}")
-            web_view = client.invoke(RequestAppWebView(
-                    peer=bot,
-                    app=app,
-                    platform='android',
-                    write_allowed=True,
-                    start_param=ref
-                ))
-            auth_url = web_view.url
-            json.loads((unquote(string=unquote(string=auth_url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])))[5:].split('&chat_instance')[0])
+            try:
+                bot = client.resolve_peer(peer)
+                app = InputBotAppShortName(bot_id=bot, short_name=f"{name}")
+                web_view = client.invoke(RequestAppWebView(
+                        peer=bot,
+                        app=app,
+                        platform='android',
+                        write_allowed=True,
+                        start_param=ref
+                    ))
+                auth_url = web_view.url
+                json.loads((unquote(string=unquote(string=auth_url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])))[5:].split('&chat_instance')[0])
 
-            client.join_chat('notpixel_channel')
-            client.join_chat('notcoin')
-
-
+                #client.join_chat('notpixel_channel')
+                #client.join_chat('notcoin')
 
 
-        except Exception as err:
-            self.log(f"{err}")
-        client.disconnect()
-        return unquote(auth_url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])
+
+
+            except Exception as err:
+                self.log(f"{err}")
+            client.disconnect()
+            try:
+                return unquote(auth_url.split('tgWebAppData=')[1].split('&tgWebAppVersion')[0])
+            except (IndexError, AttributeError) as e:
+                attempt += 1
+                print(f"Попытка {attempt}: Ошибка получения querry_id: {e}")
+
+                if attempt < retries:
+                    print(f"Жду 70 секунд перед повторной попыткой...")
+                    time.sleep(70)
+                else:
+                    print(f"Превышено количество попыток. Операция не выполнена.")
+                    return None
 
 
 
