@@ -575,7 +575,7 @@ class PixelTod:
     def paint_pixel(self, data: Data):
 
 
-        url_img = "https://notpx.app/api/v2/image"
+        url_img = "https://image.notpx.app/api/v2/image"
         url = "https://notpx.app/api/v1/mining/status"
         headers = self.base_headers.copy()
         headers["Authorization"] = f"initData {data.init_data}"
