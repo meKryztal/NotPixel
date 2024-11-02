@@ -415,11 +415,11 @@ class PixelTod:
                 else:
                     proxy_dict = None
                 if method == 'GET':
-                    res = self.scraper.get(url, headers=headers, proxies=proxy_dict)
+                    res = self.scraper.get(url, headers=headers, proxies=proxy_dict, timeout=30)
                 elif method == 'POST':
-                    res = self.scraper.post(url, headers=headers, data=data, proxies=proxy_dict)
+                    res = self.scraper.post(url, headers=headers, data=data, proxies=proxy_dict, timeout=30)
                 elif method == 'PUT':
-                    res = self.scraper.put(url, headers=headers, proxies=proxy_dict)
+                    res = self.scraper.put(url, headers=headers, proxies=proxy_dict, timeout=30)
 
                 else:
                     raise ValueError(f'Не поддерживаемый метод: {method}')
