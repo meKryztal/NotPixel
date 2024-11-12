@@ -30,9 +30,9 @@ SQUAD = -1001943111151  # айди канала сквала
 SQUAD2 = "cmVmPTY5MjIxMjcwODk="  # рефка сквада
 
 ################################################
-NUM = 1345237852 # номер картинки
-COR = (99, 130, 190, 221)  # координаты
-COLOR = ["#000000"]  # цвета
+NUM = 7306278632 # номер картинки
+COR = (0, 15, 0, 15)  # координаты
+COLOR = ["#FF99AA"]  # цвета
 ################################################
 
 
@@ -161,6 +161,7 @@ class PixelTod:
                 "Max": 1
             }
         }
+
 
     def data_parsing(self, data):
         return {key: value for key, value in (i.split('=') for i in unquote(data).split('&'))}
@@ -415,11 +416,11 @@ class PixelTod:
                 else:
                     proxy_dict = None
                 if method == 'GET':
-                    res = self.scraper.get(url, headers=headers, proxies=proxy_dict, timeout=30)
+                    res = self.scraper.get(url, headers=headers, proxies=proxy_dict)
                 elif method == 'POST':
-                    res = self.scraper.post(url, headers=headers, data=data, proxies=proxy_dict, timeout=30)
+                    res = self.scraper.post(url, headers=headers, data=data, proxies=proxy_dict)
                 elif method == 'PUT':
-                    res = self.scraper.put(url, headers=headers, proxies=proxy_dict, timeout=30)
+                    res = self.scraper.put(url, headers=headers, proxies=proxy_dict)
 
                 else:
                     raise ValueError(f'Не поддерживаемый метод: {method}')
@@ -579,17 +580,19 @@ class PixelTod:
         url = "https://notpx.app/api/v1/mining/status"
         headers = self.base_headers.copy()
         headers["Authorization"] = f"initData {data.init_data}"
-        max_retries = 15
-        for attempt in range(max_retries):
-            try:
-                res_img = self.api_call(url_img, headers=headers)
-                image = Image.open(BytesIO(res_img.content))
-                image.save("1.png")
-                res_img.raise_for_status()
-                break
-            except (requests.exceptions.ChunkedEncodingError, requests.exceptions.HTTPError, PIL.UnidentifiedImageError):
+        #max_retries = 15
+        #for attempt in range(max_retries):
+           # try:
 
-                time.sleep(3)
+             #   res_img = self.api_call(url_img, headers=headers)
+             #   print(f'{res_img}')
+             #   image = Image.open(BytesIO(res_img.content))
+             #   image.save("1.png")
+              #  res_img.raise_for_status()
+              #  break
+            #except (requests.exceptions.ChunkedEncodingError, requests.exceptions.HTTPError, PIL.UnidentifiedImageError):
+
+                #time.sleep(3)
 
         res = self.api_call(url, headers=headers)
 
@@ -623,10 +626,15 @@ class PixelTod:
             if res_i.status_code == 200 or res.status_code == 201:
 
                 for _ in range(num):
-                    time.sleep(0.1)
-                    ids = self.compare_images()
-                    pixel_id = ids[0]
-                    color = ids[1]
+                    time.sleep(0.5)
+                    #ids = self.compare_images()
+
+                    x = random.randint(COR[0], COR[1])
+                    y = random.randint(COR[2], COR[3])
+                    id = y * 1000
+                    id += x + 1
+                    pixel_id = id
+                    color = random.choice(COLOR)
                     datat = {
                         "pixelId": pixel_id,
                         "newColor": color
