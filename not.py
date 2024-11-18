@@ -17,6 +17,7 @@ import random
 from random import randint
 from PIL import Image
 from io import BytesIO
+from list import color_coords_list
 
 init(autoreset=True)
 
@@ -31,8 +32,6 @@ SQUAD2 = "cmVmPTY5MjIxMjcwODk="  # рефка сквада
 
 ################################################
 NUM = 7306278632 # номер картинки
-COR = (0, 15, 0, 15)  # координаты
-COLOR = ["#FF99AA"]  # цвета
 ################################################
 
 
@@ -628,13 +627,13 @@ class PixelTod:
                 for _ in range(num):
                     time.sleep(0.5)
                     #ids = self.compare_images()
-
-                    x = random.randint(COR[0], COR[1])
-                    y = random.randint(COR[2], COR[3])
+                    random_color, random_coord = random.choice(color_coords_list)
+                    x = random_coord[0]
+                    y = random_coord[1]
                     id = y * 1000
                     id += x + 1
                     pixel_id = id
-                    color = random.choice(COLOR)
+                    color = random_color
                     datat = {
                         "pixelId": pixel_id,
                         "newColor": color
